@@ -9,9 +9,9 @@ public class Physics {
 
 	public Physics(ArrayList<Particle> allParticles) {
 		this.allParticles = allParticles;
-		collided = new ArrayList<Integer>(allParticles.size());
-		for(int i = 0; i < collided.size(); ++i){
-			collided.add(i, -1);
+		this.collided = new ArrayList<Integer>();
+		for(int i = 0; i < this.allParticles.size(); ++i){
+			collided.add(-1);
 		}
 	}
 	
@@ -120,13 +120,19 @@ public class Physics {
 				}
 			}
 			// System.out.println("index: " + index + ", min: " + min);
-			if (index > -1) {
-				collide(p, allParticles.get(index), min);
-				
-				this.collided.set(this.allParticles.indexOf(p), index);
-				this.collided.set(index, this.allParticles.indexOf(p));
-				
+			if (index < 0) {
+				return;
 			}
+			collide(p, allParticles.get(index), min);
+
+//			if (index > this.collided.size() ||
+//				this.allParticles.indexOf(p) > this.collided.size()) {
+//				return;
+//			}
+			System.out.println("allParticles index of " + p + " : " + this.allParticles.indexOf(p));
+			System.out.println("collided size: " + collided.size());
+			this.collided.set(this.allParticles.indexOf(p), index);
+			this.collided.set(index, this.allParticles.indexOf(p));
 		}
 	// }
 
