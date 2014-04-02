@@ -129,8 +129,6 @@ public class Physics {
 //				this.allParticles.indexOf(p) > this.collided.size()) {
 //				return;
 //			}
-			System.out.println("allParticles index of " + p + " : " + this.allParticles.indexOf(p));
-			System.out.println("collided size: " + collided.size());
 			this.collided.set(this.allParticles.indexOf(p), index);
 			this.collided.set(index, this.allParticles.indexOf(p));
 		}
