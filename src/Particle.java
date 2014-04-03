@@ -172,7 +172,7 @@ public class Particle {
 		this.color = c;
 	}
 	
-	public double makeDirection(Point q1, Point q2){
+	public double makeDirection(Point q1, Point q2){ // gets the degrees rotation from 0 degrees to that going from q1 to q2 
 		ArrayList<Double> nq = normalize(q1, q2);
 		double x = nq.get(0);
 		double y = nq.get(1);
@@ -184,7 +184,7 @@ public class Particle {
 		}
 	}
 	
-	public void draw(Graphics g){
+	public void draw(Graphics g){ // draws the particle and its velocity (from center and sides for later use)
 		Point q1 = new Point(), q2 = new Point();
 		
 		q1.setLocation(location.x + diameter / 2, location.y + diameter /2);
@@ -204,7 +204,7 @@ public class Particle {
 		g.drawLine((int)(q1.x - x * r), (int)(q1.y - y * r), (int)(q2.x - x * r), (int)(q2.y - y * r));
 	}
 	
-	public void move(){
+	public void move(){ //if not collided moves the particle
 		if(!collided){
 			location.setLocation(location.x + xspeed, location.y + yspeed);
 		}
@@ -213,7 +213,7 @@ public class Particle {
 		}
 	}
 	
-	public ArrayList<Double> normalize(Point q1, Point q2){
+	public ArrayList<Double> normalize(Point q1, Point q2){ //creates a vector of length one between q1 and q2
 		ArrayList<Double> point = new ArrayList<Double>();
 		double y = q2.y - q1.y;
 		double x = q2.x - q1.x;
