@@ -14,7 +14,7 @@ public class DrawPanel{
 		this.frame = frame;
 		ArrayList<Particle> allParticles = new ArrayList<Particle>();
 		Point center = new Point(frame.getWidth() / 2, frame.getHeight() / 2);
-		for(int i = 0; i < 150; i++){
+		for(int i = 0; i < 50; i++){
 			Point point = new Point();
 			point.setLocation(frame.getWidth() * Math.random(), frame.getHeight() * Math.random());
 			
@@ -31,7 +31,8 @@ public class DrawPanel{
 		BufferStrategy bs = frame.getBufferStrategy();
 		Graphics g = bs.getDrawGraphics();
 		g.clearRect(0, 0, frame.getHeight(), frame.getHeight());
-		for(Particle p : this.physics.getAllParticles()){
+		for(int i = 0; i < physics.getAllParticles().size(); ++i){
+			Particle p = physics.getAllParticles().get(i);
 			//System.out.println(p + "'s xspeed: " + p.getXSpeed() + ", yspeed: " + p.getYSpeed());
 			physics.doPhysics(p);
 			p.draw(g);

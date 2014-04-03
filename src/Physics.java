@@ -15,56 +15,50 @@ public class Physics {
 		}
 	}
 	
-	public void doPhysics(Particle p){
+	public void doPhysics(Particle p){ // calls all major physics functions on the provided particle
 		gravity(p);
 		checkBounds(p);
 		collider(p);
 	}
 
-	public void gravity(Particle p) {
+	public void gravity(Particle p) { // applies gravity by adding to the yspeed of the particle
 		if (p.getLocation().y + p.getDiameter() < 745) {
 			p.setSpeed(p.getXSpeed(), p.getYSpeed() + GRAVITY);
 		}
 	}
 
-	public void checkBounds(Particle p) {
+	public void checkBounds(Particle p) {//check if the particle is within the bounds of the screen
 		double tempX = p.getXSpeed();
 		double tempY = p.getYSpeed();
 		if (p.getLocation().x < 0) {
 			if (p.getXSpeed() < 0) {
 				tempX = -p.getXSpeed() * p.getElast();
 			} else if (p.getXSpeed() == 0) {
-				tempX = 0;
+				p.setLocation(p.getDiameter(), p.getLocation().y);
 			}
 		}
 		if (p.getLocation().y < 25) {
 			if (p.getYSpeed() < 0) {
 				tempY = -p.getYSpeed() * p.getElast();
 			} else if (p.getYSpeed() == 0) {
-				tempY = 0;
+				p.setLocation(p.getLocation().x, 25 + p.getDiameter());
 			}
 		}
 		if (p.getLocation().x + p.getDiameter() > 750) {
 			if (p.getXSpeed() > 0) {
 				tempX = -p.getXSpeed() * p.getElast();
 			} else if (p.getXSpeed() == 0) {
-				tempX = 0;
+				p.setLocation(749 - p.getDiameter(), p.getLocation().y);
 			}
 		}
 		if (p.getLocation().y + p.getDiameter() > 750) {
 			if (p.getYSpeed() > 0) {
 				tempY = -p.getYSpeed() * p.getElast();
 			} else if (p.getYSpeed() == 0) {
-				tempY = 0;
+				p.setLocation(p.getLocation().x, 749 - p.getDiameter());
 			}
 		}
-		if (p.getLocation().y + p.getDiameter() > 745
-				&& p.getLocation().y > 750) {
-			if (p.getYSpeed() < 1) {
-				p.setLocation(p.getLocation().x, 750 - p.getDiameter() / 2);
-				tempY = 0;
-			}
-		}
+		
 		p.setSpeed(tempX, tempY);
 	}
 
@@ -129,8 +123,12 @@ public class Physics {
 //				this.allParticles.indexOf(p) > this.collided.size()) {
 //				return;
 //			}
+			/**
+			this.collided.ensureCapacity(allParticles.size());
+			this.allParticles.ensureCapacity(this.collided.size());
 			this.collided.set(this.allParticles.indexOf(p), index);
 			this.collided.set(index, this.allParticles.indexOf(p));
+			*/
 		}
 	// }
 
