@@ -230,25 +230,32 @@ public class Physics {
 	 */
 
 	public void collide(Particle p, Particle b, double x0) {
-
+		double pxl, bxl;
 		// /**
 		p.setCollided(true);
 		b.setCollided(true);
 		double t = (p.getDiameter() + b.getDiameter()) / 2;
-		double dotd = dotProd(p, b);
-		double pdir = p.getDirection();
-		double bdir = b.getDirection();
-		double pangle = (pdir == min(pdir, bdir)) ? dotd - pdir : pdir - dotd;
-		double cpangle = Math.tan(Math.toRadians(pangle));
-		double dist = (t * cpangle) / (1 + cpangle * cpangle);
-		double px = (t * cpangle * cpangle) / (1 + cpangle * cpangle);
-		double bx = t - px;
-		double pxl = x0 - Math.cos(pdir) * Math.sqrt(dist * dist + px * px);
-		double bxl = x0 - Math.cos(bdir) * Math.sqrt(dist * dist + bx * bx);
-		double fp = (pxl - p.getLocation().x) / (p.getXSpeed());
-		double fb = (bxl - b.getLocation().x) / (b.getXSpeed());
-		p.setLocation(pxl, p.getLocation().y + fp * p.getYSpeed());
-		b.setLocation(bxl, b.getLocation().y + fb * b.getYSpeed());
+		double dotd = dotProd(p, b); // angle between p, b
+		double pdir = Math.toRadians(180 + p.getDirection());	//p vector direction
+		double bdir = Math.toRadians(180 + b.getDirection()); //b vector direction
+		double theta = Math.toRadians(dotd/2) + Math.random(); //angle between dist vector and p
+		double tantheta = Math.tan(theta); // tan(theta)
+		double dist = (t * tantheta) / (1 + (tantheta * tantheta)); //the distance along theta from x0 to the normal between p and b == t
+		double px = (t * tantheta * tantheta) / (1 + (tantheta * tantheta)); // distance from end of dist vector to p
+		double bx = t - px; // distance from end of dist vector to b
+		double adist = theta + min(pdir, bdir); // the angle realative to xy plane for dist vector
+		if(px < bx){
+			pxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist + 90) * px)); // the x value of the combined vectors dist and px subtracted from x0
+			bxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist - 90) * bx)); // the x value of the combined vectors dist and bx subtracted from x0
+		}
+		else{
+			pxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist - 90) * px)); // the x value of the combined vectors dist and px subtracted from x0
+			bxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist + 90) * bx)); // the x value of the combined vectors dist and bx subtracted from x0
+		}
+		double fp = (pxl - p.getLocation().x) / (p.getXSpeed()); // fraction of p vector traveled
+		double fb = (bxl - b.getLocation().x) / (b.getXSpeed()); // fraction of b vector traveled
+		p.setLocation(pxl, p.getLocation().y + fp * p.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps p on p vector
+		b.setLocation(bxl, b.getLocation().y + fb * b.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps b on b vector
 		// System.out.println("fp: " + fp + ", fb: " + fb + ", pxl: " + pxl +
 		// ", bxl: " + bxl);
 		p.setVelocity(0, -p.getXSpeed());
