@@ -97,8 +97,9 @@ public class Physics {
 				} else if (dr > d) {
 					// System.out.println("too far");
 					maycollide.add(-1.);
-				} else if (dr < (p.getDiameter() + b.getDiameter()) / 2) {
+				} else if (dr < (p.getDiameter() + b.getDiameter()) / 2  - 2) {
 					maycollide.add((double) p.getLocation().x);
+					break;
 				} else {
 					// System.out.println(willCollide(q1, q2, v1, v2));
 					maycollide.add(willCollide(q1, q2, v1, v2));
@@ -256,8 +257,8 @@ public class Physics {
 		b.setLocation(bxl, b.getLocation().y + fb * b.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps b on b vector
 		// System.out.println("fp: " + fp + ", fb: " + fb + ", pxl: " + pxl +
 		// ", bxl: " + bxl);
-		p.setVelocity(0, -p.getXSpeed());
-		b.setVelocity(0, -b.getXSpeed());
+		p.setVelocity(30 * Math.random() - 15, -p.getXSpeed());
+		b.setVelocity(30 * Math.random() - 15, -b.getXSpeed());
 		// System.out.println("p's direction: " + p.getDirection() +
 		// ", tspeed: " + p.getTSpeed()
 		// + ", xspeed: " + p.getXSpeed() + ", yspeed: " + p.getYSpeed());

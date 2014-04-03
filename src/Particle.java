@@ -28,7 +28,7 @@ public class Particle {
 	}
 
 	public Particle(Point point){
-		this(dmass, delast, dcofric, 0, 0, ddiameter, dcollided, point, dcolor);
+		this(dmass, delast, dcofric, 20 * Math.random() - 10, 20 * Math.random() - 10, ddiameter, dcollided, point, dcolor);
 	}
 	
 	public Particle(double mass, double elast, double cofric, double x, double y, int diameter, boolean collided, Point location, Color color){
