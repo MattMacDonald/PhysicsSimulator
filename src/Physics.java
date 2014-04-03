@@ -4,8 +4,8 @@ import java.util.ArrayList;
 public class Physics {
 	public static final double GRAVITY = .5;
 
-	private ArrayList<Particle> allParticles;
-	private ArrayList<Integer> collided;
+	private ArrayList<Particle> allParticles; // all particles
+	private ArrayList<Integer> collided; // particles that have collided and the index of the particle they collided with
 
 	public Physics(ArrayList<Particle> allParticles) {
 		this.allParticles = allParticles;
@@ -28,8 +28,8 @@ public class Physics {
 	}
 
 	public void checkBounds(Particle p) {//check if the particle is within the bounds of the screen
-		double tempX = p.getXSpeed();
-		double tempY = p.getYSpeed();
+		double tempX = p.getXSpeed(); //possibly changed xspeed value
+		double tempY = p.getYSpeed(); //pissibly changed yspeed value
 		if (p.getLocation().x < 0) {
 			if (p.getXSpeed() < 0) {
 				tempX = -p.getXSpeed() * p.getElast();
@@ -59,7 +59,7 @@ public class Physics {
 			}
 		}
 		
-		p.setSpeed(tempX, tempY);
+		p.setSpeed(tempX, tempY); //in case tempX or tempY changed, corrects p.getXSpeed() and p.getYSpeed()
 	}
 
 	// calls methods to check for collisions, and to properly handle them
@@ -77,8 +77,11 @@ public class Physics {
 			Point v1 = new Point();
 			Point v2 = new Point();
 
-			double d, dr;
-
+			double d, dr; //d is a range, based on the speeds of the particles, to ignore particles because they cant collide to
+				// reduce the ammount of computation per frame
+				// dr is the distance between the two particles
+				// q1 and q2 are the start and end points respectively of the vector for p
+				// v1 and v2 are the start and end points respectively of the vector for b
 			q1 = p.getLocation();
 			q2.setLocation(p.getLocation().x + p.getXSpeed() + p.getDiameter(),
 					p.getLocation().y + p.getYSpeed() + p.getDiameter());
@@ -92,16 +95,14 @@ public class Physics {
 						b.getLocation().y + b.getYSpeed() + b.getDiameter());
 				dr = (v1.x - q1.x) * (v1.x - q1.x) + (v1.y - q1.y)
 						* (v1.y - q1.y);
-				if (b == p) {
+				if (b == p) { //dont collide with your self
 					maycollide.add(-2.);
 				} else if (dr > d) {
-					// System.out.println("too far");
 					maycollide.add(-1.);
 				} else if (dr < (p.getDiameter() + b.getDiameter()) / 2  - 2) {
 					maycollide.add((double) p.getLocation().x);
 					break;
 				} else {
-					// System.out.println(willCollide(q1, q2, v1, v2));
 					maycollide.add(willCollide(q1, q2, v1, v2));
 				}
 			}
@@ -114,7 +115,6 @@ public class Physics {
 					index = i;
 				}
 			}
-			// System.out.println("index: " + index + ", min: " + min);
 			if (index < 0) {
 				return;
 			}
@@ -135,8 +135,8 @@ public class Physics {
 
 	// determines if two particles collide during the next frame, returns the x
 	// value of where they collide, -1 if they dont
-	public double willCollide(Point q1, Point q2, Point v1, Point v2) {
-		double a1, a2, b1, b2, x0 = 0;
+	public double willCollide(Point q1, Point q2, Point v1, Point v2) { // determines if two particles will collide
+		double a1 = 0, a2 = 0, b1 = 0, b2 = 0, x0 = 0; // a1 = slope of first vector, a2 = slope of second vector, b1 = intercept, b2 = intercept, x0 = x location of center collision
 		if (q1.x == q2.x) {
 			if (v1.x == v2.x) {
 				if (q1.x == v1.x) {
@@ -170,6 +170,7 @@ public class Physics {
 				x0 = -(b1 - b2) / (a1 - a2);
 			}
 		}
+		x0 = -(b1 - b2) / (a1 - a2);
 		return (x0 >= min(q1.x, q2.x) && x0 <= max(q1.x, q2.x)
 				&& x0 >= min(v1.x, v2.x) && x0 <= max(v1.x, v2.x)) ? x0 : -1;
 	}
@@ -230,7 +231,7 @@ public class Physics {
 
 	public void collide(Particle p, Particle b, double x0) {
 		double pxl, bxl;
-		// /**
+		
 		p.setCollided(true);
 		b.setCollided(true);
 		double t = (p.getDiameter() + b.getDiameter()) / 2;
@@ -255,17 +256,9 @@ public class Physics {
 		double fb = (bxl - b.getLocation().x) / (b.getXSpeed()); // fraction of b vector traveled
 		p.setLocation(pxl, p.getLocation().y + fp * p.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps p on p vector
 		b.setLocation(bxl, b.getLocation().y + fb * b.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps b on b vector
-		// System.out.println("fp: " + fp + ", fb: " + fb + ", pxl: " + pxl +
-		// ", bxl: " + bxl);
+		
 		p.setVelocity(30 * Math.random() - 15, -p.getXSpeed());
 		b.setVelocity(30 * Math.random() - 15, -b.getXSpeed());
-		// System.out.println("p's direction: " + p.getDirection() +
-		// ", tspeed: " + p.getTSpeed()
-		// + ", xspeed: " + p.getXSpeed() + ", yspeed: " + p.getYSpeed());
-
-		// System.out.println("b's direction: " + b.getDirection() +
-		// ", tspeed: " + b.getTSpeed()
-		// + ", xspeed: " + b.getXSpeed() + ", yspeed: " + b.getYSpeed());
 
 		// y = t*tan(theta)/1 + tan2(theta)
 		// x = t* tan^2/ (1 + tan2 )
@@ -273,15 +266,15 @@ public class Physics {
 		// shift down the line starting at x0 with angle dotd, and find where
 		// the
 		// magnitude of the normal to dotd == the radius of p + the radius of d
-		// */
+		// 
 
 	}
 
-	public void react(Particle p, Particle b) {
+	public void react(Particle p, Particle b) { //collision reaction, currently un-implemented
 		double phi, theta, px, py, bx, by;
 	}
 	
-	public ArrayList<Particle> getAllParticles() {
+	public ArrayList<Particle> getAllParticles() { //gets allParticles
 		return this.allParticles;
 	}
 }

@@ -3,7 +3,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 public class Particle {
-	private double mass, elast, cofric, xspeed, yspeed, tspeed;
+	private double mass, elast, cofric, xspeed, yspeed, tspeed; // tspeed = total velocity, coric = coefficient of friction (currently unused)
 	private Point location = new Point();
 	private int diameter;
 	private Color color;
@@ -82,12 +82,12 @@ public class Particle {
 		return this.collided;
 	}
 	
-	public double getDirection(){
+	public double getDirection(){ //gets direction relative to 0 degrees
 		double direction = Math.toDegrees(Math.atan2(yspeed, xspeed));
 		return (direction > 0) ? direction: direction + 360;
 	}
 	
-	public void setSpeed(double x, double y){
+	public void setSpeed(double x, double y){ //sets x and y speeds as well as updating tspeed
 		if(x > MIN_SPEED){
 			this.xspeed = (x < MAX_SPEED) ? x: MAX_SPEED;
 		}
@@ -103,7 +103,7 @@ public class Particle {
 		this.tspeed = Math.sqrt(Math.abs(x * x + y * y));
 	}
 	
-	public void setVelocity(double direction, double speed){
+	public void setVelocity(double direction, double speed){ //uses a direction and a tspeed to set new direction
 		while(direction < MIN_DIRECTION){
 			direction += MAX_DIRECTION;
 		}
