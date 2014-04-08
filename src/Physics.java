@@ -16,7 +16,7 @@ public class Physics {
 	}
 	
 	public void doPhysics(Particle p){ // calls all major physics functions on the provided particle
-		gravity(p);
+		//gravity(p);
 		checkBounds(p);
 		collider(p);
 	}
@@ -29,7 +29,7 @@ public class Physics {
 
 	public void checkBounds(Particle p) {//check if the particle is within the bounds of the screen
 		double tempX = p.getXSpeed(); //possibly changed xspeed value
-		double tempY = p.getYSpeed(); //pissibly changed yspeed value
+		double tempY = p.getYSpeed(); //possibly changed yspeed value
 		if (p.getLocation().x < 0) {
 			if (p.getXSpeed() < 0) {
 				tempX = -p.getXSpeed() * p.getElast();
@@ -137,40 +137,41 @@ public class Physics {
 	// value of where they collide, -1 if they dont
 	public double willCollide(Point q1, Point q2, Point v1, Point v2) { // determines if two particles will collide
 		double a1 = 0, a2 = 0, b1 = 0, b2 = 0, x0 = 0; // a1 = slope of first vector, a2 = slope of second vector, b1 = intercept, b2 = intercept, x0 = x location of center collision
-		if (q1.x == q2.x) {
-			if (v1.x == v2.x) {
-				if (q1.x == v1.x) {
-					return (v1.y >= min(q1.y, q2.y) && v1.y <= max(q1.y, q2.y) || v2.y >= min(
-							q1.y, q2.y) && v2.y <= max(q1.y, q2.y)) ? q1.x : -1;
+		if (q1.x == q2.x) { // is line q vertical?
+			if (v1.x == v2.x) { // is line v vertical?
+				if (q1.x == v1.x) { // do they share x coordinates?
+					return (v1.y >= min(q1.y, q2.y) && v1.y <= max(q1.y, q2.y) ||
+							v2.y >= min(q1.y, q2.y) && v2.y <= max(q1.y, q2.y)) ? q1.x : -1; // do their y coordinates overlap?
 				} else {
-					return -1;
+					return -1; // if both vertical but not matching x coordinates
 				}
 			} else {
-				a2 = (v2.y - v1.y) / (v2.x - v1.x);
-				b2 = v1.y - a2 * v1.x;
-				x0 = q1.x;
+				a2 = (v2.y - v1.y) / (v2.x - v1.x); // in the case that only q is vertical, get slope for v
+				b2 = v1.y - a2 * v1.x; // y intercept of v
+				x0 = q1.x; // x coordinate of intersection (if there is one)
 			}
-		} else if (v1.x == v2.x) {
-			a1 = (q2.y - q1.y) / (q2.x - q1.x);
-			b1 = q1.y - a1 * q1.x;
-			x0 = v1.x;
-		} else {
-			a1 = (q2.y - q1.y) / (q2.x - q1.x);
-			b1 = q1.y - a1 * q1.x;
-			a2 = (v2.y - v1.y) / (v2.x - v1.x);
-			b2 = v1.y - a2 * v1.x;
-			if (a1 == a2) {
-				if (b1 == b2) {
-					return (v1.x >= min(q1.x, q2.x) && v1.x <= max(q1.x, q2.x) || v2.x >= min(
-							q1.x, q2.x) && v2.x <= max(q1.x, q2.x)) ? x0 : -1;
+		}
+		else if (v1.x == v2.x) { // q isn't vertical but v still might be
+			a1 = (q2.y - q1.y) / (q2.x - q1.x); // get slope for q since v is vertical
+			b1 = q1.y - a1 * q1.x; // y intercept of q
+			x0 = v1.x; // x coordinate of intersection (if there is one)
+		}
+		else { // now we know they both aren't vertical
+			a1 = (q2.y - q1.y) / (q2.x - q1.x); // slope for q
+			b1 = q1.y - a1 * q1.x; // intercept for q
+			a2 = (v2.y - v1.y) / (v2.x - v1.x); // slope for v
+			b2 = v1.y - a2 * v1.x; // intercept for v
+			if (a1 == a2) { // are they parallel?
+				if (b1 == b2) { // are they on the same line?
+					return ((v1.x >= min(q1.x, q2.x) && v1.x <= max(q1.x, q2.x)) ||
+							(v2.x >= min(q1.x, q2.x) && v2.x <= max(q1.x, q2.x))) ? x0 : -1; // do they happen in the same interval
 				} else {
-					return -1;
+					return -1; // nope, no collision here
 				}
-			} else {
+			} else { // cool they aren't parallel..
 				x0 = -(b1 - b2) / (a1 - a2);
 			}
 		}
-		x0 = -(b1 - b2) / (a1 - a2);
 		return (x0 >= min(q1.x, q2.x) && x0 <= max(q1.x, q2.x)
 				&& x0 >= min(v1.x, v2.x) && x0 <= max(v1.x, v2.x)) ? x0 : -1;
 	}
@@ -191,13 +192,13 @@ public class Physics {
 		Point b1 = b.getLocation();
 		Point b2 = new Point();
 
-		p2.setLocation(p.getLocation().x + p.getXSpeed() + p.getDiameter(),
-				p.getLocation().y + p.getYSpeed() + p.getDiameter());
-		b2.setLocation(b.getLocation().x + b.getXSpeed() + b.getDiameter(),
-				b.getLocation().y + b.getYSpeed() + b.getDiameter());
+		p2.setLocation(p.getLocation().x + p.getXSpeed() + p.getDiameter() / 2,
+				p.getLocation().y + p.getYSpeed() + p.getDiameter() / 2);
+		b2.setLocation(b.getLocation().x + b.getXSpeed() + b.getDiameter() / 2,
+				b.getLocation().y + b.getYSpeed() + b.getDiameter() / 2);
 
-		ArrayList<Double> np = p.normalize(p2, p1);
-		ArrayList<Double> nb = b.normalize(b2, b1);
+		ArrayList<Double> np = Particle.normalize(p1, p2);
+		ArrayList<Double> nb = Particle.normalize(b1, b2);
 
 		return Math.toDegrees(Math.acos(np.get(0) * nb.get(0) + np.get(1)
 				* nb.get(1)));
@@ -230,8 +231,8 @@ public class Physics {
 	 */
 
 	public void collide(Particle p, Particle b, double x0) {
-		double pxl, bxl;
-		
+		double pxl, bxl, fp, fb;
+		System.out.println("x0: " + x0);
 		p.setCollided(true);
 		b.setCollided(true);
 		double t = (p.getDiameter() + b.getDiameter()) / 2;
@@ -252,13 +253,28 @@ public class Physics {
 			pxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist - 90) * px)); // the x value of the combined vectors dist and px subtracted from x0
 			bxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist + 90) * bx)); // the x value of the combined vectors dist and bx subtracted from x0
 		}
-		double fp = (pxl - p.getLocation().x) / (p.getXSpeed()); // fraction of p vector traveled
-		double fb = (bxl - b.getLocation().x) / (b.getXSpeed()); // fraction of b vector traveled
+		
+		System.out.println("p xspeed: " +p.getXSpeed() + ", b xspeed: " + b.getXSpeed());
+		fp = (pxl - p.getLocation().x) / (p.getXSpeed()); // fraction of p vector traveled
+		fb = (bxl - b.getLocation().x) / (b.getXSpeed()); // fraction of b vector traveled
+		if(p.getXSpeed() == 0 && b.getXSpeed() == 0){
+			fp = 0;
+			fb = 0;
+		}
+		else {
+			if (p.getXSpeed() == 0) {
+				fp = fb;
+			}
+			if (b.getXSpeed() == 0) {
+				fb = fp;
+			}
+		}
+		System.out.println("pxl: " + pxl + ", bxl: " + bxl + ", fp: " + fp + ", fb: " + fb);
 		p.setLocation(pxl, p.getLocation().y + fp * p.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps p on p vector
 		b.setLocation(bxl, b.getLocation().y + fb * b.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps b on b vector
 		
-		p.setVelocity(30 * Math.random() - 15, -p.getXSpeed());
-		b.setVelocity(30 * Math.random() - 15, -b.getXSpeed());
+		p.setVelocity(-p.getXSpeed(), p.getYSpeed());
+		b.setVelocity(-p.getXSpeed(), p.getYSpeed());
 
 		// y = t*tan(theta)/1 + tan2(theta)
 		// x = t* tan^2/ (1 + tan2 )

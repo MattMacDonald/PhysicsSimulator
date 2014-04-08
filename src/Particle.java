@@ -41,7 +41,7 @@ public class Particle {
 		this.tspeed = Math.sqrt(Math.abs(x * x + y * y));
 		this.diameter = diameter;
 		this.collided = collided;
-		this.location.setLocation(location.x + this.diameter, location.y + this.diameter);
+		this.location.setLocation(location.x, location.y);
 	}
 	
 	public double getXSpeed(){
@@ -71,7 +71,8 @@ public class Particle {
 	}
 	
 	public Point getLocation(){
-		return this.location;
+		Point loc = new Point(location.x + diameter / 2, location.y + diameter / 2);
+		return loc;
 	}
 	
 	public Color getColor(){
@@ -172,7 +173,7 @@ public class Particle {
 		this.color = c;
 	}
 	
-	public double makeDirection(Point q1, Point q2){ // gets the degrees rotation from 0 degrees to that going from q1 to q2 
+	public static double makeDirection(Point q1, Point q2){ // gets the degrees rotation from 0 degrees to that going from q1 to q2 
 		ArrayList<Double> nq = normalize(q1, q2);
 		double x = nq.get(0);
 		double y = nq.get(1);
@@ -213,7 +214,7 @@ public class Particle {
 		}
 	}
 	
-	public ArrayList<Double> normalize(Point q1, Point q2){ //creates a vector of length one between q1 and q2
+	public static ArrayList<Double> normalize(Point q1, Point q2){ //creates a vector of length one between q1 and q2
 		ArrayList<Double> point = new ArrayList<Double>();
 		double y = q2.y - q1.y;
 		double x = q2.x - q1.x;

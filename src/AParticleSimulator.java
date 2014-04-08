@@ -43,39 +43,29 @@ public class AParticleSimulator implements Runnable{
 	private class mousehandler implements MouseListener, MouseMotionListener{
 
 		public void mouseDragged(MouseEvent e) {
-			System.out.println("Mouse is dragging");
 		}
 
 		public void mouseMoved(MouseEvent e) {
-			System.out.println("Mouse moved");
 		}
 
 		public void mouseClicked(MouseEvent e) {
 			Point point = new Point();
 			point.setLocation(e.getX() - 10, e.getY());
 			panel.physics.getAllParticles().add(new Particle(point));
-			String s = String.format("Clicked at %d, %d", e.getX(), e.getY());
-			System.out.println(s);
 		}
 
 		public void mousePressed(MouseEvent e) {
-			String s = String.format("Pressed at %d %d", e.getX(), e.getY());
-			System.out.println(s);
 		}
 		
 		public void mouseReleased(MouseEvent e) {
-			String s = String.format("Released at %d %d", e.getX(), e.getY());
-			System.out.println(s);
 			
 		}
 
 		public void mouseEntered(MouseEvent e) {
-			System.out.println("mouseEntered");
 			
 		}
 
 		public void mouseExited(MouseEvent e) {
-			System.out.println("mouseExited");
 		}
 		
 	}

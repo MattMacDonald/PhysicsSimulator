@@ -14,16 +14,25 @@ public class DrawPanel{
 		this.frame = frame;
 		ArrayList<Particle> allParticles = new ArrayList<Particle>();
 		Point center = new Point(frame.getWidth() / 2, frame.getHeight() / 2);
+		/**
+		allParticles.add(new Particle(new Point(300, 400)));
+		allParticles.add(new Particle(new Point(450, 400)));
+		Point point1 = new Point();
+		point1.setLocation(frame.getWidth() * Math.random(), frame.getHeight() * Math.random());
+		allParticles.get(0).setVelocity(Particle.makeDirection(allParticles.get(0).getLocation(), center), 10);
+		allParticles.get(1).setVelocity(Particle.makeDirection(allParticles.get(1).getLocation(), center), 10);
+		*/
 		for(int i = 0; i < 50; i++){
 			Point point = new Point();
 			point.setLocation(frame.getWidth() * Math.random(), frame.getHeight() * Math.random());
 			
 			Particle particle = new Particle(point);
-			double direction = particle.makeDirection(point, center);
+			double direction = Particle.makeDirection(point, center);
 			particle.setVelocity(direction, 10);
 			
 			allParticles.add(particle);
 		}
+		
 		physics = new Physics(allParticles);
 	}
 	
