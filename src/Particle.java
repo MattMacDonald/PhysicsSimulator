@@ -166,7 +166,7 @@ public class Particle {
 		else{
 			tempY = 0;
 		}
-		location.setLocation(tempX, tempY);
+		location.setLocation(tempX - diameter / 2, tempY - diameter / 2);
 	}
 	
 	public void setColor(Color c){
@@ -188,8 +188,8 @@ public class Particle {
 	public void draw(Graphics g){ // draws the particle and its velocity (from center and sides for later use)
 		Point q1 = new Point(), q2 = new Point();
 		
-		q1.setLocation(location.x + diameter / 2, location.y + diameter /2);
-		q2.setLocation(location.x + xspeed + diameter / 2, location.y + yspeed + diameter /2);
+		q1.setLocation(getLocation().x, getLocation().y);
+		q2.setLocation(getLocation().x + getXSpeed(), getLocation().y + getYSpeed());
 		
 		double a = makeDirection(q1, q2);
 		a += 90;
