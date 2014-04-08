@@ -16,7 +16,7 @@ public class Physics {
 	}
 	
 	public void doPhysics(Particle p){ // calls all major physics functions on the provided particle
-		//gravity(p);
+		gravity(p);
 		checkBounds(p);
 		collider(p);
 	}
@@ -103,7 +103,7 @@ public class Physics {
 					maycollide.add((double) p.getLocation().x);
 					break;
 				} else {
-					maycollide.add(willCollide(q1, q2, v1, v2));
+					maycollide.add(willCollide(p, b));
 				}
 			}
 			double min = 750;
@@ -135,7 +135,42 @@ public class Physics {
 
 	// determines if two particles collide during the next frame, returns the x
 	// value of where they collide, -1 if they dont
-	public double willCollide(Point q1, Point q2, Point v1, Point v2) { // determines if two particles will collide
+	public double willCollide(Particle a, Particle b) { // determines if two particles will collide
+		Point q1 = new Point(), q2 = new Point(), v1 = new Point(), v2 = new Point();
+		double ca = Math.cos(a.getDirection()), sa = Math.sin(a.getDirection());
+		double cb = Math.cos(b.getDirection()), sb = Math.sin(b.getDirection());
+		double ar = a.getDiameter() / 2, br = b.getDiameter() / 2;
+		
+		if(a.getSide(b) == 1){
+			q1.setLocation(a.getLocation().x + ca * ar , a.getLocation().y + sa * ar);
+			q2.setLocation(a.getLocation().x + ca * ar + a.getXSpeed(),
+						   a.getLocation().y + sa * ar + a.getYSpeed());
+		}
+		else if(a.getSide(b) == -1){
+			q1.setLocation(a.getLocation().x - ca * ar , a.getLocation().y - sa * ar);
+			q2.setLocation(a.getLocation().x - ca * ar + a.getXSpeed(),
+						   a.getLocation().y - sa * ar + a.getYSpeed());
+		}
+		else{ // these first three checks are to determine which side (relative to the velocity vector) b is on, looking from a
+			q1.setLocation(a.getLocation().x, a.getLocation().y);
+			q2.setLocation(a.getLocation().x + a.getXSpeed(),
+						   a.getLocation().y + a.getYSpeed());
+		}
+		if(b.getSide(a) == 1){
+			v1.setLocation(b.getLocation().x + cb * br , b.getLocation().y + sb * br);
+			v2.setLocation(b.getLocation().x + cb * br + b.getXSpeed(),
+						   b.getLocation().y + sb * br + b.getYSpeed());
+		}
+		else if(b.getSide(a) == -1){
+			v1.setLocation(b.getLocation().x - cb * br , b.getLocation().y - sb * br);
+			v2.setLocation(b.getLocation().x - cb * br + b.getXSpeed(),
+						   b.getLocation().y - sb * br + b.getYSpeed());
+		}
+		else{// these next three checks are to determine which side (relative to the velocity vector) a is on, looking from b
+			v1.setLocation(b.getLocation().x, b.getLocation().y);
+			v2.setLocation(b.getLocation().x + b.getXSpeed(),
+						   b.getLocation().y + b.getYSpeed());
+		}
 		double a1 = 0, a2 = 0, b1 = 0, b2 = 0, x0 = 0; // a1 = slope of first vector, a2 = slope of second vector, b1 = intercept, b2 = intercept, x0 = x location of center collision
 		if (q1.x == q2.x) { // is line q vertical?
 			if (v1.x == v2.x) { // is line v vertical?
@@ -231,59 +266,7 @@ public class Physics {
 	 */
 
 	public void collide(Particle p, Particle b, double x0) {
-		double pxl, bxl, fp, fb;
-		System.out.println("x0: " + x0);
-		p.setCollided(true);
-		b.setCollided(true);
-		double t = (p.getDiameter() + b.getDiameter()) / 2;
-		double dotd = dotProd(p, b); // angle between p, b
-		double pdir = Math.toRadians(180 + p.getDirection());	//p vector direction
-		double bdir = Math.toRadians(180 + b.getDirection()); //b vector direction
-		double theta = Math.toRadians(dotd/2) + Math.random(); //angle between dist vector and p
-		double tantheta = Math.tan(theta); // tan(theta)
-		double dist = (t * tantheta) / (1 + (tantheta * tantheta)); //the distance along theta from x0 to the normal between p and b == t
-		double px = (t * tantheta * tantheta) / (1 + (tantheta * tantheta)); // distance from end of dist vector to p
-		double bx = t - px; // distance from end of dist vector to b
-		double adist = theta + min(pdir, bdir); // the angle realative to xy plane for dist vector
-		if(px < bx){
-			pxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist + 90) * px)); // the x value of the combined vectors dist and px subtracted from x0
-			bxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist - 90) * bx)); // the x value of the combined vectors dist and bx subtracted from x0
-		}
-		else{
-			pxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist - 90) * px)); // the x value of the combined vectors dist and px subtracted from x0
-			bxl = x0 + ((Math.cos(adist) * dist) + (Math.cos(adist + 90) * bx)); // the x value of the combined vectors dist and bx subtracted from x0
-		}
 		
-		System.out.println("p xspeed: " +p.getXSpeed() + ", b xspeed: " + b.getXSpeed());
-		fp = (pxl - p.getLocation().x) / (p.getXSpeed()); // fraction of p vector traveled
-		fb = (bxl - b.getLocation().x) / (b.getXSpeed()); // fraction of b vector traveled
-		if(p.getXSpeed() == 0 && b.getXSpeed() == 0){
-			fp = 0;
-			fb = 0;
-		}
-		else {
-			if (p.getXSpeed() == 0) {
-				fp = fb;
-			}
-			if (b.getXSpeed() == 0) {
-				fb = fp;
-			}
-		}
-		System.out.println("pxl: " + pxl + ", bxl: " + bxl + ", fp: " + fp + ", fb: " + fb);
-		p.setLocation(pxl, p.getLocation().y + fp * p.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps p on p vector
-		b.setLocation(bxl, b.getLocation().y + fb * b.getYSpeed()); // set the location to the calculated x value and the fraction of the y value that keeps b on b vector
-		
-		p.setVelocity(-p.getXSpeed(), p.getYSpeed());
-		b.setVelocity(-p.getXSpeed(), p.getYSpeed());
-
-		// y = t*tan(theta)/1 + tan2(theta)
-		// x = t* tan^2/ (1 + tan2 )
-
-		// shift down the line starting at x0 with angle dotd, and find where
-		// the
-		// magnitude of the normal to dotd == the radius of p + the radius of d
-		// 
-
 	}
 
 	public void react(Particle p, Particle b) { //collision reaction, currently un-implemented

@@ -85,7 +85,7 @@ public class Particle {
 	
 	public double getDirection(){ //gets direction relative to 0 degrees
 		double direction = Math.toDegrees(Math.atan2(yspeed, xspeed));
-		return (direction > 0) ? direction: direction + 360;
+		return (direction >= 0) ? direction: direction + 360;
 	}
 	
 	public void setSpeed(double x, double y){ //sets x and y speeds as well as updating tspeed
@@ -201,7 +201,9 @@ public class Particle {
 		g.fillOval(location.x, location.y, diameter, diameter);
 		g.setColor(Color.BLUE);
 		g.drawLine(q1.x, q1.y, q2.x, q2.y);
+		g.setColor(Color.GREEN);
 		g.drawLine((int)(q1.x + x * r), (int)(q1.y + y * r), (int)(q2.x + x * r), (int)(q2.y + y * r));
+		g.setColor(Color.RED);
 		g.drawLine((int)(q1.x - x * r), (int)(q1.y - y * r), (int)(q2.x - x * r), (int)(q2.y - y * r));
 	}
 	
@@ -212,6 +214,31 @@ public class Particle {
 		else{
 			setCollided(false);
 		}
+	}
+	
+	public int getSide(Particle b){
+		double angle = makeDirection(getLocation(), b.getLocation());
+		if(angle == getDirection())
+		{
+			return 0;
+		}
+		if(getDirection() < 180){
+			if(angle > this.getDirection() && angle < this.getDirection() + 180){
+				return -1;
+			}
+			else{
+				return 1;
+			}
+		}
+		if(getDirection() >= 180){
+			if(angle < getDirection() && angle > getDirection() - 180){
+				return 1;
+			}
+			else{
+				return -1;
+			}
+		}
+		return 0;
 	}
 	
 	public static ArrayList<Double> normalize(Point q1, Point q2){ //creates a vector of length one between q1 and q2

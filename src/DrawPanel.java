@@ -22,7 +22,7 @@ public class DrawPanel{
 		allParticles.get(0).setVelocity(Particle.makeDirection(allParticles.get(0).getLocation(), center), 10);
 		allParticles.get(1).setVelocity(Particle.makeDirection(allParticles.get(1).getLocation(), center), 10);
 		*/
-		for(int i = 0; i < 50; i++){
+		for(int i = 0; i < 5; i++){
 			Point point = new Point();
 			point.setLocation(frame.getWidth() * Math.random(), frame.getHeight() * Math.random());
 			
