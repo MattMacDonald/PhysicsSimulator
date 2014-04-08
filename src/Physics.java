@@ -50,8 +50,7 @@ public class Physics {
 		if (p.getLocation().x + p.getDiameter() > AParticleSimulator.SCREEN_SIZE.width) {
 			if (p.getXSpeed() > 0) {
 				tempX = -p.getXSpeed() * p.getElast();
-			}
-			else if(p.getXSpeed() == 0){
+			} else if (p.getXSpeed() == 0) {
 				tempX = -1;
 			}
 			p.setLocation(749 - p.getDiameter(), p.getLocation().y);
@@ -60,7 +59,8 @@ public class Physics {
 			if (p.getYSpeed() > 0) {
 				tempY = -p.getYSpeed() * p.getElast();
 			}
-			p.setLocation(p.getLocation().x, AParticleSimulator.SCREEN_SIZE.width - p.getDiameter());
+			p.setLocation(p.getLocation().x,
+					AParticleSimulator.SCREEN_SIZE.width - p.getDiameter());
 		}
 
 		p.setSpeed(tempX, tempY); // in case tempX or tempY changed, corrects
@@ -69,12 +69,13 @@ public class Physics {
 
 	// calls methods to check for collisions, and to properly handle them
 	public void collider(Particle p) {
-		/**
-		 * if (p.getCollided()) { react(p,
-		 * allParticles.get(collided.get(allParticles.indexOf(p)))); }
-		 * 
-		 * else {
-		 */
+		
+		if (p.getCollided()) { 
+			react(p,allParticles.get(collided.get(allParticles.indexOf(p))));
+		}
+		
+		else {
+		 
 		ArrayList<Double> maycollide = new ArrayList<Double>();
 
 		Point q1, q2 = new Point();
@@ -127,12 +128,14 @@ public class Physics {
 		// this.allParticles.indexOf(p) > this.collided.size()) {
 		// return;
 		// }
-		/**
-		 * this.collided.ensureCapacity(allParticles.size());
-		 * this.allParticles.ensureCapacity(this.collided.size());
-		 * this.collided.set(this.allParticles.indexOf(p), index);
-		 * this.collided.set(index, this.allParticles.indexOf(p));
-		 */
+		
+		while(allParticles.size() > collided.size()){
+			collided.add(-1);
+		}
+		this.collided.set(this.allParticles.indexOf(p), index);
+		this.collided.set(index, this.allParticles.indexOf(p));
+		}
+
 	}
 
 	// }
@@ -356,7 +359,30 @@ public class Physics {
 
 	public void react(Particle p, Particle b) { // collision reaction, currently
 												// un-implemented
-		double phi, theta, px, py, bx, by;
+		double phi, theta1, theta2, v1, v2, vp1x, vp1y, vp2x, vp2y, u1x, u1y, u2x, u2y, up1x, up1y, up2x, up2y, m1, m2;
+		m1 = p.getMass();
+		m2 = b.getMass();
+		phi = Particle.makeDirection(p.getLocation(), b.getLocation()) - 360;
+		theta1 = p.getDirection();
+		theta2 = b.getDirection();
+		v1 = p.getTSpeed();
+		v2 = b.getTSpeed();
+		vp1x = v1 * Math.cos(theta1 - phi);
+		vp1y = v1 * Math.sin(theta1 - phi);
+		vp2x = v2 * Math.cos(theta2 - phi);
+		vp2y = v2 * Math.sin(theta2 - phi);
+		up1x = ((m1 - m2) * vp1x + (m2 + m2) * vp2x) / (m1 + m2);
+		up2x = ((m1 + m1) * vp1x + (m2 - m1) * vp2x) / (m1 + m2);
+		up1y = vp1y;
+		up2y = vp2y;
+		u1x = up1x * Math.cos(phi) + up1y * Math.sin(phi);
+		u1y = up1x * Math.sin(phi) + up1y * Math.cos(phi);
+		u2x = up2x * Math.cos(phi) + up2y * Math.sin(phi);
+		u2y = up2x * Math.sin(phi) + up2y * Math.cos(phi);
+
+		p.setSpeed(u1x, u1y);
+		b.setSpeed(u2x, u2y);
+
 	}
 
 	public ArrayList<Particle> getAllParticles() { // gets allParticles
