@@ -1,15 +1,16 @@
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Physics {
 	public static final double GRAVITY = .5;
 
-	private ArrayList<Particle> allParticles; // all particles
+	private CopyOnWriteArrayList<Particle> allParticles; // all particles
 	private ArrayList<Integer> collided; // particles that have collided and the
 											// index of the particle they
 											// collided with
 
-	public Physics(ArrayList<Particle> allParticles) {
+	public Physics(CopyOnWriteArrayList<Particle> allParticles) {
 		this.allParticles = allParticles;
 		this.collided = new ArrayList<Integer>();
 		for (int i = 0; i < this.allParticles.size(); ++i) {
@@ -107,6 +108,11 @@ public class Physics {
 			} else if (dr < (p.getDiameter() + b.getDiameter()) / 2) { // if they overlap
 				maycollide.add((double) p.getLocation().x);
 			} else {
+				if(willCollide(p, b) > -1){
+					if(p.getTSpeed() > 100){
+						System.err.println("Tspeed >.> " + p.getTSpeed() + " \n willCollide(" + p + ", " + b + "): " + willCollide(p, b));
+					}
+				}
 				maycollide.add(willCollide(p, b));
 			}
 		}
@@ -182,7 +188,7 @@ public class Physics {
 			v2.setLocation(b.getLocation().x + b.getXSpeed(), b.getLocation().y
 					+ b.getYSpeed());
 		}
-		double a1 = 0, a2 = 0, b1 = 0, b2 = 0, x0 = 0; // a1 = slope of first
+		double a1, a2, b1, b2, x0; // a1 = slope of first
 														// vector, a2 = slope of
 														// second vector, b1 =
 														// intercept, b2 =
@@ -198,41 +204,49 @@ public class Physics {
 																					// y
 																					// coordinates
 																					// overlap?
-				} else {
+				}
+				else {
 					return -1; // if both vertical but not matching x
 								// coordinates
 				}
-			} else {
+			}
+			else {
 				a2 = (v2.y - v1.y) / (v2.x - v1.x); // in the case that only q
 													// is vertical, get slope
 													// for v
 				b2 = v1.y - a2 * v1.x; // y intercept of v
 				x0 = q1.x; // x coordinate of intersection (if there is one)
 			}
-		} else if (v1.x == v2.x) { // q isn't vertical but v still might be
+		}
+		else if (v1.x == v2.x) { // q isn't vertical but v still might be
 			a1 = (q2.y - q1.y) / (q2.x - q1.x); // get slope for q since v is
 												// vertical
 			b1 = q1.y - a1 * q1.x; // y intercept of q
 			x0 = v1.x; // x coordinate of intersection (if there is one)
-		} else { // now we know they both aren't vertical
+		}
+		else { // now we know they both aren't vertical
 			a1 = (q2.y - q1.y) / (q2.x - q1.x); // slope for q
 			b1 = q1.y - a1 * q1.x; // intercept for q
 			a2 = (v2.y - v1.y) / (v2.x - v1.x); // slope for v
 			b2 = v1.y - a2 * v1.x; // intercept for v
-			if (a1 == a2) { // are they parallel?
+			if (a1 == a2 || a1 == -a2) { // are they parallel?
 				if (b1 == b2) { // are they on the same line?
-					return ((v1.x >= min(q1.x, q2.x) && v1.x <= max(q1.x, q2.x)) || (v2.x >= min(
-							q1.x, q2.x) && v2.x <= max(q1.x, q2.x))) ? x0 : -1; // do
-																				// they
-																				// happen
-																				// in
-																				// the
-																				// same
-																				// interval
-				} else {
+					 // do they happen in the same interval?
+					if(v1.x >= min(q1.x, q2.x) && v1.x <= max(q1.x, q2.x)){
+						return v1.x;
+					}
+					else if(v2.x >= min(q1.x, q2.x) && v2.x <= max(q1.x, q2.x)){
+						return v2.x;
+					}
+					else{
+						return -1;
+					}
+				}
+				else {
 					return -1; // nope, no collision here
 				}
-			} else { // cool they aren't parallel..
+			}
+			else { // cool they aren't parallel...
 				x0 = -(b1 - b2) / (a1 - a2);
 			}
 		}
@@ -333,33 +347,33 @@ public class Physics {
 
 	public void react(Particle p, Particle b) { // collision reaction, formula derived from site below
 												// http://blogs.msdn.com/b/faber/archive/2013/01/09/elastic-collisions-of-balls.aspx
-		double phi, theta1, theta2, v1, v2, vp1x, vp1y, vp2x, vp2y, u1x, u1y, u2x, u2y, up1x, up1y, up2x, up2y, m1, m2;
+		double phi, theta1, theta2, v1, v2, vp1x, vp1y, vp2x, vp2y, u1x, u1y, u2x, u2y, up1x, up1y, up2x, up2y, m1, m2; //lots o variables
 		m1 = p.getMass();
 		m2 = b.getMass();
-		phi = Particle.makeDirection(p.getLocation(), b.getLocation()) - 360;
-		theta1 = p.getDirection();
-		theta2 = b.getDirection();
-		v1 = p.getTSpeed();
-		v2 = b.getTSpeed();
-		vp1x = v1 * Math.cos(theta1 - phi);
-		vp1y = v1 * Math.sin(theta1 - phi);
-		vp2x = v2 * Math.cos(theta2 - phi);
-		vp2y = v2 * Math.sin(theta2 - phi);
-		up1x = p.getElast() * (((m1 - m2) * vp1x + (m2 + m2) * vp2x) / (m1 + m2));
-		up2x = b.getElast() * (((m1 + m1) * vp1x + (m2 - m1) * vp2x) / (m1 + m2));
-		up1y = vp1y;
-		up2y = vp2y;
-		u1x = up1x * Math.cos(phi) + up1y * Math.sin(phi);
-		u1y = up1x * Math.sin(phi) + up1y * Math.cos(phi);
-		u2x = up2x * Math.cos(phi) + up2y * Math.sin(phi);
-		u2y = up2x * Math.sin(phi) + up2y * Math.cos(phi);
+		phi = Particle.makeDirection(p.getLocation(), b.getLocation()) - 360; //angle of the new x axis
+		theta1 = p.getDirection(); //p's angle
+		theta2 = b.getDirection(); //b's angle
+		v1 = p.getTSpeed(); // p's vector speed
+		v2 = b.getTSpeed(); // b's vector speed
+		vp1x = v1 * Math.cos(theta1 - phi); // p's x speed on new axis
+		vp1y = v1 * Math.sin(theta1 - phi); // p's y speed on new axis
+		vp2x = v2 * Math.cos(theta2 - phi); // b's x speed on new axis
+		vp2y = v2 * Math.sin(theta2 - phi); // b's y speed on new axis
+		up1x = p.getElast() * (((m1 - m2) * vp1x + (m2 + m2) * vp2x) / (m1 + m2)); //resultant x for p on new axis
+		up2x = b.getElast() * (((m1 + m1) * vp1x + (m2 - m1) * vp2x) / (m1 + m2)); //resultant x for b on new axis
+		up1y = vp1y; //resultant y for p on new axis
+		up2y = vp2y; //resultant y for b on new axis
+		u1x = up1x * Math.cos(phi) + up1y * Math.sin(phi); //resultant x for p on real axis
+		u1y = up1x * Math.sin(phi) + up1y * Math.cos(phi); //resultant y for p on real axis
+		u2x = up2x * Math.cos(phi) + up2y * Math.sin(phi); //resultant x for b on real axis
+		u2y = up2x * Math.sin(phi) + up2y * Math.cos(phi); //resultant y for b on real axis
 
 		p.setSpeed(u1x, u1y);
 		b.setSpeed(u2x, u2y);
 
 	}
 
-	public ArrayList<Particle> getAllParticles() { // gets allParticles
+	public CopyOnWriteArrayList<Particle> getAllParticles() { // gets allParticles
 		return this.allParticles;
 	}
 }

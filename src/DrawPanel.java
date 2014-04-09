@@ -4,6 +4,7 @@ import java.awt.Point;
 import javax.swing.JFrame;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.image.BufferStrategy;
 
 public class DrawPanel{
@@ -12,7 +13,7 @@ public class DrawPanel{
 	
 	public DrawPanel(JFrame frame) {
 		this.frame = frame;
-		ArrayList<Particle> allParticles = new ArrayList<Particle>();
+		CopyOnWriteArrayList<Particle> allParticles = new CopyOnWriteArrayList<Particle>();
 		Point center = new Point(frame.getWidth() / 2, frame.getHeight() / 2);
 		/**
 		allParticles.add(new Particle(new Point(300, 400)));
@@ -22,7 +23,7 @@ public class DrawPanel{
 		allParticles.get(0).setVelocity(Particle.makeDirection(allParticles.get(0).getLocation(), center), 10);
 		allParticles.get(1).setVelocity(Particle.makeDirection(allParticles.get(1).getLocation(), center), 10);
 		*/
-		for(int i = 0; i < 30; i++){
+		for(int i = 0; i < 20; i++){
 			Point point = new Point();
 			point.setLocation(frame.getWidth() * Math.random(), frame.getHeight() * Math.random());
 			
