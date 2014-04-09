@@ -51,7 +51,7 @@ public class Physics {
 			if (p.getXSpeed() > 0) {
 				tempX = -p.getXSpeed() * p.getElast();
 			} else if (p.getXSpeed() == 0) {
-				tempX = -1;
+				//tempX = -1;
 			}
 			p.setLocation(749 - p.getDiameter(), p.getLocation().y);
 		}
@@ -104,7 +104,7 @@ public class Physics {
 				maycollide.add(-2.);
 			} else if (dr > d) { // if they are too far apart
 				maycollide.add(-1.);
-			} else if (dr < (p.getDiameter() + b.getDiameter()) / 2 - 2) { // if they overlap
+			} else if (dr < (p.getDiameter() + b.getDiameter()) / 2) { // if they overlap
 				maycollide.add((double) p.getLocation().x);
 			} else {
 				maycollide.add(willCollide(p, b));
@@ -268,32 +268,6 @@ public class Physics {
 				* nb.get(1)));
 	}
 
-	/**
-	 * public ArrayList<Point> getRect(Particle p){ Point q1 = new Point(), q2 =
-	 * new Point();
-	 * 
-	 * q1.setLocation(p.getLocation().x + p.getDiameter() / 2, p.getLocation().y
-	 * + p.getDiameter() /2); q2.setLocation(p.getLocation().x + p.getXSpeed() +
-	 * p.getDiameter() / 2, p.getLocation().y + p.getYSpeed() + p.getDiameter()
-	 * /2);
-	 * 
-	 * double a = p.makeDirection(q1, q2); double a1 = a + 90; double x =
-	 * Math.cos(Math.toRadians(a)); double y = Math.sin(Math.toRadians(a));
-	 * double r = p.getDiameter() / 2; ArrayList<Point> corners = new
-	 * ArrayList<Point>();
-	 * 
-	 * Point c1 = new Point(), c2 = new Point(), c3 = new Point(), c4 = new
-	 * Point(); c1.setLocation(q1.x + x * r, q1.y + y * r); c2.setLocation(q2.x
-	 * + x * r, q2.y + y * r); c3.setLocation(q2.x - x * r, q2.y - y * r);
-	 * c4.setLocation(q1.x - x * r, q1.y - y * r);
-	 * 
-	 * corners.add(c1); corners.add(c2); corners.add(c3); corners.add(c4);
-	 * 
-	 * return corners;
-	 * 
-	 * }
-	 */
-
 	public void collide(Particle a, Particle b, double x0) {
 		a.setCollided(true);
 		b.setCollided(true);
@@ -357,8 +331,8 @@ public class Physics {
 
 	}
 
-	public void react(Particle p, Particle b) { // collision reaction, currently
-												// un-implemented
+	public void react(Particle p, Particle b) { // collision reaction, formula derived from site below
+												// http://blogs.msdn.com/b/faber/archive/2013/01/09/elastic-collisions-of-balls.aspx
 		double phi, theta1, theta2, v1, v2, vp1x, vp1y, vp2x, vp2y, u1x, u1y, u2x, u2y, up1x, up1y, up2x, up2y, m1, m2;
 		m1 = p.getMass();
 		m2 = b.getMass();
@@ -371,8 +345,8 @@ public class Physics {
 		vp1y = v1 * Math.sin(theta1 - phi);
 		vp2x = v2 * Math.cos(theta2 - phi);
 		vp2y = v2 * Math.sin(theta2 - phi);
-		up1x = ((m1 - m2) * vp1x + (m2 + m2) * vp2x) / (m1 + m2);
-		up2x = ((m1 + m1) * vp1x + (m2 - m1) * vp2x) / (m1 + m2);
+		up1x = p.getElast() * (((m1 - m2) * vp1x + (m2 + m2) * vp2x) / (m1 + m2));
+		up2x = b.getElast() * (((m1 + m1) * vp1x + (m2 - m1) * vp2x) / (m1 + m2));
 		up1y = vp1y;
 		up2y = vp2y;
 		u1x = up1x * Math.cos(phi) + up1y * Math.sin(phi);

@@ -199,12 +199,15 @@ public class Particle {
 		
 		g.setColor(color);
 		g.fillOval(location.x, location.y, diameter, diameter);
+		
+		
 		g.setColor(Color.BLUE);
 		g.drawLine(q1.x, q1.y, q2.x, q2.y);
 		g.setColor(Color.GREEN);
 		g.drawLine((int)(q1.x + x * r), (int)(q1.y + y * r), (int)(q2.x + x * r), (int)(q2.y + y * r));
 		g.setColor(Color.RED);
 		g.drawLine((int)(q1.x - x * r), (int)(q1.y - y * r), (int)(q2.x - x * r), (int)(q2.y - y * r));
+		
 	}
 	
 	public void move(){ //if not collided moves the particle
